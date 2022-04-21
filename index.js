@@ -2,6 +2,8 @@
 const express = require('express');
 const WebSocket = require('ws');
 const cookies = require('cookie-parser');
+const https = require('https');
+const fs = require('fs');
 
 // Global Classes
 const User = require('./classes/users');
@@ -14,7 +16,14 @@ const app = express();
 app.use(cookies());
 
 // WebSocket Application
-const server = new WebSocket.Server({ port: 8080 });
+const httpServer = https.createServer({
+    cert: fs.readFileSync('keys/priv.pem'),
+    key: fs.readFileSync('keys/priv.pem')
+})
+
+httpServer.listen(8080);
+
+const server = new WebSocket.Server({ server: httpServer });
 server.on('connection', ( socket ) => {
     let sData = new User(socket)
     connections.push(sData);
@@ -38,4 +47,4 @@ app.use((req, res) => {
     res.sendFile(__dirname+'/draw.html');
 })
 
-app.listen(80)
+app.listen(151)
