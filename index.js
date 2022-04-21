@@ -16,7 +16,7 @@ const app = express();
 app.use(cookies());
 
 // WebSocket Application
-const server = new WebSocket.Server({ port: 8080 });
+const server = new WebSocket.Server({ port: 8443 });
 server.on('connection', ( socket ) => {
     let sData = new User(socket)
     connections.push(sData);
