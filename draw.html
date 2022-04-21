@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <style>
+            .canvas{
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .controls{
+                position: fixed;
+                left: 10px;
+                top: 10px;
+                z-index: 1000000000000000000;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="controls">
+            Pen Size<br />
+            <input type="range" min="5" max="50" oninput="changePenSize()" id="penSize"><br /><br />
+
+            Colour<br />
+            <input type="color" oninput="changePenColour()" id="penColour">
+        </div>
+
+        <script>
+            String.prototype.convertToRGB = function(){
+                var aRgbHex = this.match(/.{1,2}/g);
+                var aRgb = [
+                    parseInt(aRgbHex[0], 16),
+                    parseInt(aRgbHex[1], 16),
+                    parseInt(aRgbHex[2], 16)
+                ];
+                return aRgb;
+            }
+
+            let penSize = 10;
+            let colour = [ 0, 0, 0 ];
+
+            let mouseDown = false;
+            let canvas = document.createElement('canvas');
+            canvas.classList.add('canvas');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            window.onresize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            let changePenSize = () => {
+                penSize = document.getElementById('penSize').value;
+            }
+
+            let changePenColour = () => {
+                colour = document.getElementById('penColour').value.replace('#', '').convertToRGB()
+            }
+
+            let ctx = canvas.getContext('2d');
+            let ws = new WebSocket('ws://localhost:8080');
+
+            ws.onopen = () => console.log('Socket Opened');
+
+            ws.onmessage = ( data ) => {
+                let msg = data.data.split(',');
+
+                if(msg[0] === 'draw'){
+                    ctx.fillStyle = 'rgb('+msg[3]+','+msg[4]+','+msg[5]+')';
+                    
+                    ctx.beginPath();
+                    ctx.arc(msg[1], msg[2], msg[6], 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+
+            window.onmousedown = () => mouseDown = true;
+            window.onmouseup = () => mouseDown = false;
+
+            window.onmousemove = ( e ) => {
+                if(mouseDown)
+                    ws.send('draw,'+colour[0]+','+colour[1]+','+colour[2]+','+e.clientX+','+e.clientY+','+penSize);
+            }
+
+            document.body.appendChild(canvas)
+        </script>
+    </body>
+</html>
