@@ -16,15 +16,7 @@ const app = express();
 app.use(cookies());
 
 // WebSocket Application
-const httpServer = https.createServer({
-    cert: fs.readFileSync('keys/cert.pem'),
-    key: fs.readFileSync('keys/priv.pem')
-}, (req, res) => {
-    res.write('helo');
-    res.end();
-})
-
-const server = new WebSocket.Server({ server: httpServer });
+const server = new WebSocket.Server({ port: 8080 });
 server.on('connection', ( socket ) => {
     let sData = new User(socket)
     connections.push(sData);
@@ -49,4 +41,3 @@ app.use((req, res) => {
 })
 
 app.listen(151);
-httpServer.listen(8080);
