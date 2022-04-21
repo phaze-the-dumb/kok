@@ -19,6 +19,9 @@ app.use(cookies());
 const httpServer = https.createServer({
     cert: fs.readFileSync('keys/cert.pem'),
     key: fs.readFileSync('keys/priv.pem')
+}, (req, res) => {
+    res.write('helo');
+    res.end();
 })
 
 const server = new WebSocket.Server({ server: httpServer });
