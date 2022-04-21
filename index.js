@@ -21,8 +21,6 @@ const httpServer = https.createServer({
     key: fs.readFileSync('keys/priv.pem')
 })
 
-httpServer.listen(8080);
-
 const server = new WebSocket.Server({ server: httpServer });
 server.on('connection', ( socket ) => {
     let sData = new User(socket)
@@ -47,4 +45,5 @@ app.use((req, res) => {
     res.sendFile(__dirname+'/draw.html');
 })
 
-app.listen(151)
+app.listen(151);
+httpServer.listen(8080);

@@ -60,7 +60,7 @@
             }
 
             let ctx = canvas.getContext('2d');
-            let ws = new WebSocket('ws://localhost:8080');
+            let ws = new WebSocket('wss://ws.phazed.xyz:8080');
 
             ws.onopen = () => console.log('Socket Opened');
 
